@@ -202,3 +202,19 @@ results = model.train(
     cache=True  # Enables caching images for faster loading
 )
 ```
+
+### Image Resizing for Optimization
+
+In our project, we have optimized the image preprocessing step by resizing all images to 340x340 pixels. This decision was made to enhance the performance of our Flutter application during real-time object detection. Here's why and how this contributes to our app's efficiency:
+
+#### Reasons for Resizing Images to 340x340:
+
+- **Uniformity**: Resizing all images to the same dimensions standardizes the input size for our YOLOv8 model, ensuring consistent processing and detection quality across different image sources.
+- **Performance**: Smaller and uniform image sizes reduce the computational load on the device's processing unit, speeding up the image processing pipeline. This is crucial for maintaining real-time performance in mobile applications.
+- **Memory Efficiency**: Using images of the same size optimizes memory usage within the application, which is particularly important for devices with limited resources.
+
+#### Implementation in Flutter:
+
+When implementing in Flutter, the resized images ensure that the application runs smoothly without lag, providing a seamless user experience even during intensive tasks such as real-time object detection. The decision to use 340x340 pixels strikes a balance between maintaining high enough resolution for accurate object detection and optimizing the speed and resource usage of our application.
+
+By resizing the images to 340x340, we ensure that our application not only performs well in terms of speed and accuracy but also operates efficiently under various operating conditions, making it suitable for deployment on a wide range of mobile devices.

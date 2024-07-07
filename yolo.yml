@@ -1,0 +1,11 @@
+# Path settings
+path: /content/drive/MyDrive/YOLOv8/NewDataset/ # Change this to the root directory of your datasets
+train: /content/drive/MyDrive/YOLOv8/NewDataset/train # Subdirectory for training data
+val: /content/drive/MyDrive/YOLOv8/NewDataset/val # Subdirectory for validation data
+
+# Model configuration
+nc: 1 # Number of classes, change this if you have more classes
+names: ['face'] # List class names as strings
+
+# Training settings
+img_size: 320 # Image size (pixels), adjust as necessary

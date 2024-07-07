@@ -99,3 +99,106 @@ If you encounter errors or do not see your files and directories appearing in Go
 ### Conclusion
 
 While working with files directly in Google Drive via Google Colab is incredibly powerful, it is important to account for potential delays and plan for handling errors. With the right approach, you can minimize disruption and maintain productivity.
+
+## Step 4: Training the YOLOv8 Model
+
+In this step, we will focus on training the YOLOv8 model using the augmented data prepared in the previous steps. Considering our application's need for real-time performance, we have chosen to use the YOLOv8n model. This decision is based on its optimal balance of speed and accuracy, making it highly suitable for real-time object detection in mobile applications.
+
+### Choosing the Model Configuration
+
+Based on the performance metrics provided in the official [Ultralytics documentation](https://docs.ultralytics.com/fr/tasks/detect/#models), we have selected the YOLOv8n model for our project. Here's why:
+
+| Model   | Size (pixels) | mAPval 50-95 | Speed CPU ONNX (ms) | Speed A100 TensorRT (ms) | Params (M) | FLOPs (B) |
+| ------- | ------------- | ------------ | ------------------- | ------------------------ | ---------- | --------- |
+| YOLOv8n | 640           | 37.3         | 80.4                | 0.99                     | 3.2        | 8.7       |
+
+As illustrated, YOLOv8n provides a substantial 37.3 mAP with an incredibly fast inference time of just 0.99 ms on an A100 using TensorRT, which is crucial for achieving real-time performance on mobile devices.
+
+### Training Process
+
+1. **Setting Up the Environment**: Ensure that your Google Colab runtime is set up with a TPU or GPU acceleration to facilitate efficient model training.
+2. **Loading the Data**: Load the augmented dataset from Google Drive, ensuring the data paths are correctly configured.
+3. **Configuring the Training Parameters**: Set up the training parameters, including learning rate, batch size, and number of epochs. For YOLOv8n, consider starting with the default settings recommended by Ultralytics and adjust based on preliminary results.
+4. **Launching the Training**: Use the Ultralytics YOLOv8 training scripts, which are optimized for various hardware configurations. Ensure to monitor the training progress through logs and TensorBoard to keep track of loss metrics and validation accuracy.
+5. **Model Evaluation**: After training, evaluate the model using the validation set to check the accuracy and make any necessary adjustments to the training regimen.
+
+### Implementation Details
+
+- **Script Execution**: All training scripts and commands should be executed within the Google Colab environment, utilizing its powerful hardware capabilities.
+- **Model Saving**: Regularly save checkpoints to Google Drive to prevent data loss and allow training to resume from the last checkpoint in case of interruptions.
+
+### Real-Time Implementation Considerations
+
+Given the YOLOv8n's high performance, special attention should be paid to integration details for real-time application:
+
+- **Optimization**: Further optimize the trained model using tools like TensorRT or ONNX for faster inference speeds.
+- **Testing**: Rigorously test the model in diverse real-world scenarios to ensure it maintains high accuracy and performance under different conditions.
+
+### Conclusion
+
+The choice of YOLOv8n aligns with our goal of developing a real-time object detection system in a Flutter application. Its impressive speed and good accuracy offer the best trade-off for our requirements, promising robust performance in a mobile environment.
+
+### Step 4.1: Preparing the Dataset for YOLOv8 Training
+
+When training a YOLOv8 model, it's essential to structure your dataset correctly to ensure that the model trains effectively and efficiently. The dataset must be organized into separate directories for training and validation, each containing subdirectories for images and labels.
+
+#### Dataset Structure
+
+The YOLOv8 model expects the following directory structure for the dataset:
+
+| Directory  | Subdirectory | Description                                                     |
+| ---------- | ------------ | --------------------------------------------------------------- |
+| `dataset/` |              | Root folder for dataset                                         |
+|            | `train/`     | Contains training data                                          |
+|            |              | - `images/`: Contains all training images                       |
+|            |              | - `labels/`: Contains corresponding .txt files with annotations |
+|            | `val/`       | Contains validation data                                        |
+|            |              | - `images/`: Contains all validation images                     |
+|            |              | - `labels/`: Contains corresponding .txt files with annotations |
+
+#### Image and Label Correspondence
+
+Each image in the `images/` subdirectory should have a corresponding `.txt` file in the `labels/` subdirectory. The names of the files in these subdirectories should match, indicating their correspondence. For example, if you have an image named `train_image1.jpg`, its corresponding label should be named `train_image1.txt`.
+
+#### Label File Format
+
+Each `.txt` file contains annotations for the objects detected in the corresponding image. The format for each line in the label files is as follows:
+
+<class_id> <x_center> <y_center> width height
+
+Where:
+
+- `<class_id>` is an integer representing the object class.
+- `<x_center>` and `<y_center>` are the normalized x and y coordinates of the center of the bounding box, relative to the dimensions of the image.
+- `<width>` and `<height>` are the normalized width and height of the bounding box, relative to the dimensions of the image.
+
+#### Importance of Data Format
+
+Ensuring that the images and labels are correctly formatted and correspond to each other is crucial for successful model training. The YOLOv8 model uses these annotations to learn the characteristics of different objects, and any discrepancy between images and labels could lead to poor model performance or training errors.
+
+This structured approach not only helps in maintaining an organized dataset but also streamlines the process of model training by ensuring that the training script can efficiently locate and use the necessary files for both training and validation phases.
+
+### Step 5: Training the YOLOv8 Model with Ultralytics Library
+
+After preparing our dataset and setting up the development environment, we proceeded to train the YOLOv8 model using the Ultralytics YOLO library. This library provides a streamlined interface for training YOLO models with custom datasets.
+
+#### Training Code Explanation
+
+We used the following Python code to initiate the training of our model:
+
+```python
+from yolov8 import YOLO
+
+# Initialize the model with the specified weights
+model = YOLO('yolov8n.pt')
+
+# Start the training process
+results = model.train(
+    data='/content/drive/MyDrive/YOLOv8/NewDataset/yolo.yml',
+    imgsz=320,  # Size of the images
+    epochs=10,  # Total number of training epochs
+    batch=16,   # Batch size
+    name='faces_detection',  # Name of the training run for checkpoint saving
+    cache=True  # Enables caching images for faster loading
+)
+```
